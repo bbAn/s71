@@ -8,6 +8,24 @@
   <section id="data"></section>
 
   <script>
+    const Info = class{
+      constructor(json){
+        const {title, header, items} = json;
+        if(typeof title != 'string' || !title) throw "invalid title";
+        if(!Array.isArray(header) || !header.length) throw "invalid header";
+        if(!Array.isArray(items) || !items.length) throw "invalid items";
+        items.forEach((v, idx)=> {
+          if(!Array.isArray(v) || v.length != header.length) {
+            throw "invalid items:" + idx;
+          }
+        });
+        this._private = {title, header, items};
+      }
+      get title(){return this._private.title;}
+      get header(){return this._private.header;}
+      get items(){return this._private.items;}
+    };
+
     const Data = class{
       async getData(){
         const json = await this._getData();
@@ -54,7 +72,7 @@
         const parent = document.querySelector(this._parent);
         if(!parent) throw "invalid parent";
         parent.innerHTML = "";
-        const [table, caption] = "table, caption".split("","").map(v=>document.createElement(v));
+        const [table, caption] = "table,caption".split(",").map(v=>document.createElement(v));
         caption.innerHTML = this._info.title;
         table.appendChild(caption);
 
@@ -72,26 +90,8 @@
       }
     }
 
-    const Info = class{
-      constructor(json){
-        const {title, header, items} = json;
-        if(typeof title != 'string' || !title) throw "invalid title";
-        if(!Array.isArray(header) || !header.length) throw "invalid header";
-        if(!Array.isAttay(items) || !items.length) throw "invalid items";
-        items.forEach((v, idx)=> {
-          if(!Array.isArray(v) || v.length != header.length) {
-            throw "invalid items:" + idx;
-          }
-        });
-        this._private = {title, header, items};
-      }
-      get title(){return this._private.title;}
-      get header(){return this._private.header;}
-      get items(){return this._private.items;}
-    };
-
     const data = new JsonData('https://gist.githubusercontent.com/bbAn/afa177b0de62522f8189df13500697de/raw/c6c1a667496c9bdc2ea0fbcd225d231005de4635/71_1.json');
-    const renderer = new Renderer();
+    const renderer = new TableRenderer("#data");
     renderer.render(data);
   </script>
 </body>
